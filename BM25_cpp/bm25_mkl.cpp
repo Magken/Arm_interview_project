@@ -19,13 +19,12 @@ float* compute_bm25(const float* term_frequencies,
                      int num_docs, 
                      int num_terms) {
     
-    float* bm25_scores = new float[num_docs];  // ✅ Allocate dynamically
+    float* bm25_scores = new float[num_docs];  // Allocate output array
 
-    #pragma omp parallel for schedule(dynamic)
+    #pragma omp parallel for schedule(static)
     for (int d = 0; d < num_docs; d++) {
         float local_score = 0.0f;
-
-        float tile_scores[TILE_SIZE];  // ✅ Use stack allocation
+        float* tile_scores = new float[TILE_SIZE];  // Dynamically allocate tile buffer
 
         for (int t_start = 0; t_start < num_terms; t_start += TILE_SIZE) {
             int t_end = min(t_start + TILE_SIZE, num_terms);
@@ -34,63 +33,62 @@ float* compute_bm25(const float* term_frequencies,
                 float tf = term_frequencies[d * num_terms + t];
                 float idf = idf_scores[t];
                 float doc_len_norm = (1.0 - b) + (b * (doc_lengths[d] / avg_doc_length));
-
                 tile_scores[t - t_start] = idf * ((tf * (k1 + 1)) / (tf + (k1 * doc_len_norm)));
             }
 
-            local_score += cblas_sdot(t_end - t_start, tile_scores, 1, idf_scores + t_start, 1);
+            // Create a vector of ones to sum tile_scores using cblas_sdot
+            float ones[TILE_SIZE];
+            for (int i = 0; i < (t_end - t_start); i++) {
+                ones[i] = 1.0f;
+            }
+
+            // Sum the tile scores using cblas_sdot
+            local_score += cblas_sdot(t_end - t_start, tile_scores, 1, ones, 1);
         }
 
-        bm25_scores[d] = local_score;  // ✅ Store the final BM25 score
+        bm25_scores[d] = local_score;  // Store the final BM25 score for document d
+        delete[] tile_scores;          // Free the tile buffer
     }
 
-    return bm25_scores;  // ✅ Caller must delete[] this memory
+    return bm25_scores;  // Caller must free this memory
 }
 
 
 
-// Example Usage
+// Simple test program to validate BM25 scoring
 int main() {
-    const int num_docs = 2;
-    const int num_terms = 64;  // Increased terms for better tiling
+    const int num_docs = 3;
+    const int num_terms = 5;  // Vocabulary size
 
-    // ✅ Allocate term frequencies dynamically
-    float* term_frequencies = new float[num_docs * num_terms];
-    
-    // Generate random term frequencies
-    for (int i = 0; i < num_docs * num_terms; i++) {
-        term_frequencies[i] = (rand() % 5) + 1;  // Random values between 1-5
-    }
+    // Term Frequencies (TF) for 3 documents, 5 terms each
+    float term_frequencies[num_docs * num_terms] = {
+        3, 0, 1, 2, 0,  // Document 1
+        0, 2, 0, 1, 3,  // Document 2
+        1, 1, 1, 1, 1   // Document 3
+    };
 
-    // ✅ Allocate idf scores dynamically
-    float* idf_scores = new float[num_terms];
-    for (int i = 0; i < num_terms; i++) {
-        idf_scores[i] = 1.0f + (rand() % 5) * 0.1f;  // Random IDF scores
-    }
+    // Precomputed IDF scores for each term
+    float idf_scores[num_terms] = {1.2, 0.8, 1.5, 1.0, 1.3};
 
-    // ✅ Allocate document lengths dynamically
-    float* doc_lengths = new float[num_docs];
-    doc_lengths[0] = 100.0;
-    doc_lengths[1] = 150.0;
-    float avg_doc_length = 125.0;
+    // Document lengths (for simplicity, all documents have length 100)
+    float doc_lengths[num_docs] = {100.0, 100.0, 100.0};
+    float avg_doc_length = 100.0;  // With all doc lengths 100
 
     // Compute BM25 scores
     float* bm25_results = compute_bm25(term_frequencies, idf_scores, doc_lengths, avg_doc_length, num_docs, num_terms);
 
-    // Print the results
-    for (int i = 0; i < num_docs; i++) {
-        cout << "BM25 Score for Document " << i << ": " << bm25_results[i] << endl;
-    }
+    // Print BM25 Scores along with expected values (for reference)
+    cout << "\n🔹 BM25 Scores for Test Documents:\n";
+    cout << "Document 1 Score: " << bm25_results[0] << "   /* expected ~4.93 */\n";
+    cout << "Document 2 Score: " << bm25_results[1] << "   /* expected ~4.31 */\n";
+    cout << "Document 3 Score: " << bm25_results[2] << "   /* expected ~5.80 */\n";
 
-    // ✅ Free all dynamically allocated memory
-    delete[] term_frequencies;
-    delete[] idf_scores;
-    delete[] doc_lengths;
+    // Free dynamically allocated memory
     delete[] bm25_results;
 
-    // Pause to view output
-    cout << "Computation complete. Press Enter to exit..." << endl;
+    cout << "\n✅ BM25 Test Completed. Press Enter to exit..." << endl;
     cin.get();
-
+    
     return 0;
 }
+
