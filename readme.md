@@ -98,7 +98,7 @@ Model-Agnostic Challenges: Passing retrieved content directly into the model ass
 + llama.ipynb — Inference notebook using Llama 3.2 1B CPU (main)
 
 
-## (ignore this ore open readme file to view non sauished structure)
+## (ignore this or open readme file to view non sqished structure)
 
 RAG_TOKENIZER/
 │
