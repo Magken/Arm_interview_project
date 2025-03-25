@@ -44,38 +44,37 @@ Model-Agnostic Challenges: Passing retrieved content directly into the model ass
 
 RAG_TOKENIZER/
 │
-├── readme.md                       # Project documentation (you're editing this!)
-├── requirements.txt                # Frozen Python dependencies
-├── retrieval_data.tar.gz           # Compressed snapshot of retrieval dataset
-├── wikipedia_category_articles.csv # Source dataset used for indexing (from dataset_aquisition.ipynb )
+├── README.md                         # Project documentation (you're editing this!)
+├── requirements.txt                  # Frozen Python dependencies
+├── retrieval_data.tar.gz             # Compressed snapshot of retrieval dataset
+├── wikipedia_category_articles.csv   # Source dataset used for indexing (from dataset_aquisition.ipynb)
 │
-├── BM25_cpp/                       # C++ source code for BM25 with MKL acceleration
-│   ├── Function_Profiling/         # Performance profiling scripts (tested using DrMemory Vscode Profiler)
-│   ├── bm25_bindings.cpp           # Pybind11 wrapper code
-│   ├── bm25_mkl.cpp                # Core MKL-based BM25 implementation
-│   └── bm25_mkl.h                  # C++ header for BM25 functions
+├── BM25_cpp/                         # C++ source code for BM25 with MKL acceleration
+│   ├── Function_Profiling/           # Performance profiling scripts (tested using DrMemory VSCode Profiler)
+│   ├── bm25_bindings.cpp             # Pybind11 wrapper code
+│   ├── bm25_mkl.cpp                  # Core MKL-based BM25 implementation
+│   └── bm25_mkl.h                    # C++ header for BM25 functions
 │
-├── build/                          # Compiled artifacts and built libraries (*Important*)
-│   ├── bm25_bindings.*             # Build output (.exp, .lib, .obj)
-│   ├── bm25_mkl.*                  # Build output (.obj, .pyd for Python module)
-│   ├── build_test.ipynb            # Test notebook for verifying compiled module
-│   ├── *.dll                       # Required runtime DLLs (e.g., Intel MKL, Python)
-│   └── req_paths.py                # Helper to set DLL & module paths (*Important*)
+├── build/                            # Compiled artifacts and built libraries (*Important*)
+│   ├── bm25_bindings.*               # Build output (.exp, .lib, .obj)
+│   ├── bm25_mkl.*                    # Build output (.obj, .pyd for Python module)
+│   ├── build_test.ipynb              # Test notebook for verifying compiled module
+│   ├── *.dll                         # Required runtime DLLs (e.g., Intel MKL, Python)
+│   └── req_paths.py                  # Helper to set DLL & module paths (*Important*)
 │
-├── retrieval_data/                 # Serialized precomputed data (decompressed from retrieval_data.tar.gz)
-│   ├── article_map.json            # Maps article IDs to text or categories
-│   ├── bm25_*.npy / *.json         # Token frequencies, lengths, IDF values for BM25
-│   ├── faiss_*.npy / .faiss        # Dense embeddings and FAISS index
-│   └── tokenized_corpus.json       # Tokenized version of the full corpus
+├── retrieval_data/                   # Serialized precomputed data (decompressed from retrieval_data.tar.gz)
+│   ├── article_map.json              # Maps article IDs to text or categories
+│   ├── bm25_*.npy / *.json           # Token frequencies, lengths, IDF values for BM25
+│   ├── faiss_*.npy / .faiss          # Dense embeddings and FAISS index
+│   └── tokenized_corpus.json         # Tokenized version of the full corpus
 │
-├── retrieval_lib/                  # Python library code
-│   ├── __init__.py                 # Library init file
-│   ├── retrieval.py                # Retrieval logic (BM25, FAISS integration)
-│   └── tokenizer.py                # Custom tokenizer subclassing HuggingFace
+├── retrieval_lib/                    # Python library code
+│   ├── __init__.py                   # Library init file
+│   ├── retrieval.py                  # Retrieval logic (BM25, FAISS integration)
+│   └── tokenizer.py                  # Custom tokenizer subclassing HuggingFace
 │
-├── trash/                          # Deprecated or unused code (temporary)
+├── trash/                            # Deprecated or unused code (temporary)
 │
-├── data_preprocess.ipynb           # Preprocessing pipeline (*creating retrieval data*)
-├── dataset_aquisition.ipynb        # Script for downloading/curating data (*Getting Test Data*)
-├── llama.ipynb                     # Inference notebook using Llama 3.2 1B CPU (*main*)
-
+├── data_preprocess.ipynb             # Preprocessing pipeline (*creating retrieval data*)
+├── dataset_aquisition.ipynb          # Script for downloading/curating data (*Getting Test Data*)
+└── llama.ipynb                       # Inference notebook using Llama 3.2 1B CPU (*Main*)
