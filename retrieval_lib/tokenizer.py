@@ -9,10 +9,7 @@ from transformers import AutoTokenizer, AutoModel
 from .retrieval import Functionalities  # Import retrieval functionality
 
 # Ensure Windows can locate required DLLs (adjust paths as needed)
-os.add_dll_directory("E:\\Intel\\oneAPI\\mkl\\latest\\bin")
-os.add_dll_directory("E:\\Coding Stuff\\Arm_interview_project\\build")
-os.add_dll_directory("C:\\Users\\Magjun\\AppData\\Local\\Programs\\Python\\Python311")
-sys.path.append("E:\\Coding Stuff\\Arm_interview_project\\build")
+from build import req_paths
 
 import bm25_mkl
 
